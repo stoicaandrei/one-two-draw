@@ -1,19 +1,22 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
-import { LoginWithGoogle, LoginAnonymously, Logout } from './Buttons';
+import { Logout, LoginWithName } from './Buttons';
 
 import { UserContext } from 'contexts';
 
 const Auth: React.FC = () => {
-  const { user, getEvents } = useContext(UserContext);
+  const { user } = useContext(UserContext);
+
+  const [name, setName] = useState('');
 
   return (
     <div>
-      <LoginWithGoogle />
-      <LoginAnonymously />
+      <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+      <LoginWithName name={name} />
       <Logout />
-      <button onClick={getEvents}>test</button>
-      {user?.displayName}
+      {user?.uid}
+      <br />
+      {user?.displayName || 'please log in'}
     </div>
   );
 };

@@ -7,14 +7,14 @@ import 'firebase/database';
 import 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDm6piMCaWI5cQ5CYjgJYWI67RzKFJz-QE',
-  authDomain: 'when2meet-565d0.firebaseapp.com',
-  databaseURL: 'https://when2meet-565d0.firebaseio.com',
-  projectId: 'when2meet-565d0',
-  storageBucket: 'when2meet-565d0.appspot.com',
-  messagingSenderId: '1016013539665',
-  appId: '1:1016013539665:web:30d52d011e959a10faeb70',
-  measurementId: 'G-Z75ZN1RPHS',
+  apiKey: "AIzaSyCh_miXz_3C9Ep2nV6RC0a_aRfP9JtlwYQ",
+  authDomain: "one-two-draw.firebaseapp.com",
+  databaseURL: "https://one-two-draw.firebaseio.com",
+  projectId: "one-two-draw",
+  storageBucket: "one-two-draw.appspot.com",
+  messagingSenderId: "927042823933",
+  appId: "1:927042823933:web:37017c8bcd6e9cf5d0c094",
+  measurementId: "G-TMSG9NM8SF"
 };
 
 // Initialize Firebase

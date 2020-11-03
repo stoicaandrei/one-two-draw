@@ -1,31 +1,22 @@
 import React, { useContext } from 'react';
 
 import { Button } from 'antd';
-import { GoogleOutlined, UserOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 
 import { UserContext } from 'contexts';
 
-export const LoginWithGoogle: React.FC = () => {
-  const { loginWithGoogle } = useContext(UserContext);
-
-  return (
-    <div>
-      <Button onClick={loginWithGoogle}>
-        <GoogleOutlined />
-        Login with google
-      </Button>
-    </div>
-  );
+type Props = {
+  name: string;
 };
 
-export const LoginAnonymously: React.FC = () => {
-  const { loginAnonymously } = useContext(UserContext);
+export const LoginWithName: React.FC<Props> = ({ name }) => {
+  const { loginWithName } = useContext(UserContext);
 
   return (
     <div>
-      <Button onClick={loginAnonymously}>
+      <Button onClick={() => loginWithName(name)}>
         <UserOutlined />
-        Login Anonymously
+        Login
       </Button>
     </div>
   );
