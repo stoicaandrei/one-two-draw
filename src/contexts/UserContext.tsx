@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from 'react';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-import { projectAuth, projectDatabase } from 'firebase_config';
+import { projectAuth } from 'firebase_config';
 
 const defaultUser = {
   uid: '',
@@ -39,25 +39,26 @@ export const UserProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
-  const [nameUpdate, setNameUpdate] = useState(false);
+  const [nameWaiting, setNameWaiting] = useState(false);
 
   useEffect(() => {
     if (!firebaseUser) return;
-    if (!firebaseUser.displayName && !nameUpdate) return;
+    if (!firebaseUser.displayName && nameWaiting) return;
 
     localStorage.setItem('user', JSON.stringify(firebaseUser));
     setUser(firebaseUser);
-  }, [firebaseUser, nameUpdate]);
+  }, [firebaseUser, nameWaiting]);
 
   const loginWithName = async (name: string) => {
     try {
+      setNameWaiting(true);
       const userCredential = await projectAuth.signInAnonymously();
       const newUser = userCredential.user;
 
       if (!newUser) return;
 
       await newUser.updateProfile({ displayName: name });
-      setNameUpdate(true);
+      setNameWaiting(false);
     } catch (error) {
       setError(error);
     }
@@ -73,7 +74,7 @@ export const UserProvider: React.FC = ({ children }) => {
     <UserContext.Provider
       value={{
         user,
-        loading,
+        loading: loading || nameWaiting,
         error,
         loginWithName,
         logout,
