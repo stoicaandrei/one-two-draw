@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import 'antd/dist/antd.css';
 
-import { UserProvider, ChatProvider } from 'contexts';
+import { UserProvider } from 'contexts';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -11,9 +11,7 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
   <React.StrictMode>
     <UserProvider>
-      <ChatProvider>
-        <App />
-      </ChatProvider>
+      <App />
     </UserProvider>
   </React.StrictMode>,
   document.getElementById('root')

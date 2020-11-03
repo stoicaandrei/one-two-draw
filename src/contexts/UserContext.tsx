@@ -7,7 +7,6 @@ import { projectAuth } from 'firebase_config';
 const defaultUser = {
   uid: '',
   displayName: '',
-  photoURL: '',
 };
 
 const defaultState = {
@@ -21,12 +20,11 @@ const defaultState = {
 type User = {
   uid: string;
   displayName: string;
-  photoURL: string;
 };
 
 type ContextProps = {
   loading: boolean;
-  user: User | null;
+  user: User;
   logout: () => void;
   loginWithName: (name: string) => void;
   error: any;
@@ -36,7 +34,7 @@ export const UserContext = createContext<ContextProps>(defaultState);
 
 export const UserProvider: React.FC = ({ children }) => {
   const [firebaseUser, loading] = useAuthState(projectAuth);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User>({} as any);
   const [error, setError] = useState(null);
 
   const [nameWaiting, setNameWaiting] = useState(false);
@@ -69,7 +67,7 @@ export const UserProvider: React.FC = ({ children }) => {
   const logout = async () => {
     await projectAuth.signOut();
     localStorage.removeItem('user');
-    setUser(null);
+    setUser(null as any);
   };
 
   return (
