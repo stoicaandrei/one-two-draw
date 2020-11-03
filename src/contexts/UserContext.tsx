@@ -57,7 +57,9 @@ export const UserProvider: React.FC = ({ children }) => {
 
       if (!newUser) return;
 
-      await newUser.updateProfile({ displayName: name });
+      const id = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
+
+      await newUser.updateProfile({ displayName: `${name} #${id}` });
       setNameWaiting(false);
     } catch (error) {
       setError(error);
