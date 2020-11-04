@@ -9,7 +9,7 @@ const AuthEnforcer: React.FC = ({ children }) => {
 
   const { user, loading, error, loginWithName } = useContext(UserContext);
 
-  if (user.uid) return <div>{children}</div>;
+  if (user) return <div>{children}</div>;
 
   return (
     <Modal footer={null} visible={true} closable={false}>

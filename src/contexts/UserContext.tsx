@@ -1,65 +1,56 @@
 import React, { createContext, useEffect, useState } from 'react';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { projectAuth } from 'firebase_config';
+import { UpdateUsername, User } from 'types';
+
+import { projectAuth, projectFirestore, projectFunctions } from 'firebase_config';
 import { randomId } from './utils';
-
-const defaultUser = {
-  uid: '',
-  displayName: '',
-};
-
-const defaultState = {
-  loading: false,
-  user: defaultUser,
-  logout: () => {},
-  loginWithName: () => {},
-  error: null,
-};
-
-export type User = {
-  uid: string;
-  displayName: string;
-};
 
 type ContextProps = {
   loading: boolean;
   user: User;
   logout: () => void;
   loginWithName: (name: string) => void;
+  updateUsername: (name: string) => void;
   error: any;
 };
 
-export const UserContext = createContext<ContextProps>(defaultState);
+export const UserContext = createContext<ContextProps>({} as ContextProps);
 
 export const UserProvider: React.FC = ({ children }) => {
   const [firebaseUser, loading] = useAuthState(projectAuth);
-  const [user, setUser] = useState<User>({} as any);
+  const doc = projectFirestore.doc(`users/${firebaseUser ? firebaseUser.uid : '1'}`);
+  const [user] = useDocumentData<User>(doc);
   const [error, setError] = useState(null);
-
-  const [nameWaiting, setNameWaiting] = useState(false);
 
   useEffect(() => {
     if (!firebaseUser) return;
-    if (!firebaseUser.displayName && nameWaiting) return;
 
-    localStorage.setItem('user', JSON.stringify(firebaseUser));
-    setUser(firebaseUser);
-  }, [firebaseUser, nameWaiting]);
+    // const retrieveUser = async () => {
+    //   const doc = await projectFirestore.doc(`users/${firebaseUser.uid}`).get();
+    //
+    //   const data = doc.data();
+    //   if (!data) return;
+    //
+    //   localStorage.setItem('user', JSON.stringify(data));
+    //   setUser(data as User);
+    // };
+    //
+    // retrieveUser().then();
+  }, [firebaseUser]);
+
+  const updateUsername = async (name: string) => {
+    const fn: UpdateUsername = projectFunctions.httpsCallable('updateUsername');
+    await fn({ name });
+  };
 
   const loginWithName = async (name: string) => {
     try {
-      setNameWaiting(true);
-      const userCredential = await projectAuth.signInAnonymously();
-      const newUser = userCredential.user;
+      await projectAuth.signInAnonymously();
 
-      if (!newUser) return;
-
-      const id = randomId();
-
-      await newUser.updateProfile({ displayName: `${name} #${id}` });
-      setNameWaiting(false);
+      await updateUsername(name);
     } catch (error) {
       setError(error);
     }
@@ -68,17 +59,17 @@ export const UserProvider: React.FC = ({ children }) => {
   const logout = async () => {
     await projectAuth.signOut();
     localStorage.removeItem('user');
-    setUser(null as any);
   };
 
   return (
     <UserContext.Provider
       value={{
-        user,
-        loading: loading || nameWaiting,
+        user: user || ({} as User),
+        loading,
         error,
         loginWithName,
         logout,
+        updateUsername,
       }}
     >
       {children}

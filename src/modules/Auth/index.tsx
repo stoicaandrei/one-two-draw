@@ -10,8 +10,7 @@ const Auth: React.FC = () => {
   return (
     <div>
       <AuthEnforcer>
-        <p>{user.uid}</p>
-        <p>{user.displayName}</p>
+        <p>{user.name}</p>
       </AuthEnforcer>
     </div>
   );
