@@ -64,7 +64,7 @@ export const UserProvider: React.FC = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        user: user || ({} as User),
+        user: user || (undefined as any),
         loading,
         error,
         loginWithName,
