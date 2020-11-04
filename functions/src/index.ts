@@ -1,9 +1,32 @@
 import * as functions from 'firebase-functions';
+import { firestore } from './config';
 
-// // Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
+import { Game } from './types';
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info('Hello logs!', { structuredData: true });
-  response.send('Hello from Firebase!');
+import { randomCode } from './utils';
+
+const resp = {
+  error: (error: string) => ({ error }),
+  data: (data = {}) => ({ data }),
+};
+
+export const createGame = functions.https.onCall(async (data, context) => {
+  const code = randomCode();
+
+  if (!context.auth?.uid) return resp.error('No uid in context');
+
+  try {
+    const newGame: Game = {
+      code,
+      creatorUid: context.auth.uid,
+      playerUids: [],
+    };
+
+    await firestore.doc(`/games/${code}`).set(newGame);
+
+    return resp.data({ code });
+  } catch (e) {
+    functions.logger.error(e);
+    return resp.error(e.toString());
+  }
 });
