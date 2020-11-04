@@ -1,13 +1,13 @@
 import React from 'react';
 
-import Auth from './modules/Auth';
+import Boarding from './modules/Boarding';
 import AuthEnforcer from './modules/Auth/AuthEnforcer';
 
 function App() {
   return (
     <div className="App">
       <AuthEnforcer>
-        <Auth />
+        <Boarding />
       </AuthEnforcer>
     </div>
   );

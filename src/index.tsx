@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import 'antd/dist/antd.css';
 
-import { UserProvider } from 'contexts';
+import { UserProvider, GameProvider } from 'contexts';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -11,7 +11,9 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
   <React.StrictMode>
     <UserProvider>
-      <App />
+      <GameProvider>
+        <App />
+      </GameProvider>
     </UserProvider>
   </React.StrictMode>,
   document.getElementById('root')

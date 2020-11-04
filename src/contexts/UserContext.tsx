@@ -17,7 +17,7 @@ const defaultState = {
   error: null,
 };
 
-type User = {
+export type User = {
   uid: string;
   displayName: string;
 };
