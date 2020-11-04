@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 
-import { projectFirestore } from 'firebase_config';
+// import { projectFirestore } from 'firebase_config';
 
 export type Game = {
   id: string;
