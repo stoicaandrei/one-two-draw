@@ -17,6 +17,7 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
+      "types": ["functions/src/types"],
       "firebase_config": ["src/firebase_config"],
       "contexts": ["src/contexts"],
       "hooks": ["src/utils"],
