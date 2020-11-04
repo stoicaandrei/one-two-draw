@@ -4,6 +4,7 @@ import { projectFirestore } from 'firebase_config';
 
 export type Game = {
   id: string;
+  code: string;
   creatorUid: string;
   playerUidS: string[];
 };
@@ -14,19 +15,7 @@ type ContextProps = {
   setId: (id: string) => void;
 };
 
-const defaultGame: Game = {
-  id: '',
-  creatorUid: '',
-  playerUidS: [],
-};
-
-const defaultState: ContextProps = {
-  id: '',
-  game: defaultGame,
-  setId: () => {},
-};
-
-export const GameContext = createContext(defaultState);
+export const GameContext = createContext({} as ContextProps);
 
 export const GameProvider: React.FC = ({ children }) => {
   const [id, setId] = useState('');
@@ -35,7 +24,7 @@ export const GameProvider: React.FC = ({ children }) => {
     <GameContext.Provider
       value={{
         id,
-        game: defaultGame,
+        game: {} as Game,
         setId,
       }}
     >

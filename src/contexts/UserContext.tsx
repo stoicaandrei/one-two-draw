@@ -3,6 +3,7 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import { projectAuth } from 'firebase_config';
+import { randomId } from './utils';
 
 const defaultUser = {
   uid: '',
@@ -55,7 +56,7 @@ export const UserProvider: React.FC = ({ children }) => {
 
       if (!newUser) return;
 
-      const id = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
+      const id = randomId();
 
       await newUser.updateProfile({ displayName: `${name} #${id}` });
       setNameWaiting(false);
