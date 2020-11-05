@@ -8,7 +8,7 @@ import { randomCode } from './utils';
 export const createDocForUser = functions.auth.user().onCreate(async (user) => {
   await firestore
     .doc(`/users/${user.uid}`)
-    .set({ uid: user.uid, name: user.displayName || 'New user' });
+    .set({ uid: user.uid, id: user.uid, name: user.displayName || 'New user' });
 });
 
 export const updateUsername = functions.https.onCall(
@@ -16,7 +16,7 @@ export const updateUsername = functions.https.onCall(
     const uid = context.auth?.uid;
     if (!uid) return;
 
-    await firestore.doc(`/users/${uid}`).set({ name: data.name });
+    await firestore.doc(`/users/${uid}`).set({ uid, name: data.name });
   }
 );
 
