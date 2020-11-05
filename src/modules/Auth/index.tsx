@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import AuthEnforcer from './AuthEnforcer';
+import AuthWrapper from './AuthWrapper';
 
 import { UserContext } from 'contexts';
 
@@ -9,9 +9,9 @@ const Auth: React.FC = () => {
 
   return (
     <div>
-      <AuthEnforcer>
+      <AuthWrapper>
         <p>{user.name}</p>
-      </AuthEnforcer>
+      </AuthWrapper>
     </div>
   );
 };

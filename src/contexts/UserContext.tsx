@@ -11,7 +11,7 @@ type ContextProps = {
   loading: boolean;
   user: User;
   logout: () => void;
-  loginWithName: (name: string) => void;
+  login: () => void;
   updateUsername: (name: string) => void;
   error: any;
 };
@@ -19,9 +19,9 @@ type ContextProps = {
 export const UserContext = createContext<ContextProps>({} as ContextProps);
 
 export const UserProvider: React.FC = ({ children }) => {
-  const [firebaseUser, loading] = useAuthState(projectAuth);
+  const [firebaseUser, loading1] = useAuthState(projectAuth);
   const doc = projectFirestore.doc(`users/${firebaseUser ? firebaseUser.uid : '1'}`);
-  const [user] = useDocumentData<User>(doc);
+  const [user, loading2] = useDocumentData<User>(doc);
   const [error, setError] = useState(null);
 
   const updateUsername = async (name: string) => {
@@ -29,11 +29,9 @@ export const UserProvider: React.FC = ({ children }) => {
     await fn({ name });
   };
 
-  const loginWithName = async (name: string) => {
+  const login = async () => {
     try {
       await projectAuth.signInAnonymously();
-
-      await updateUsername(name);
     } catch (error) {
       setError(error);
     }
@@ -48,9 +46,9 @@ export const UserProvider: React.FC = ({ children }) => {
     <UserContext.Provider
       value={{
         user: user || (undefined as any),
-        loading,
+        loading: loading1 || loading2,
         error,
-        loginWithName,
+        login,
         logout,
         updateUsername,
       }}

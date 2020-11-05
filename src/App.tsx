@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import Boarding from './modules/Boarding';
-import AuthEnforcer from './modules/Auth/AuthEnforcer';
+import AuthWrapper from './modules/Auth/AuthWrapper';
 import Game from './modules/Game';
 
 import { GameContext } from 'contexts';
@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div className="App">
-      <AuthEnforcer>{game ? <Game /> : <Boarding />}</AuthEnforcer>
+      <AuthWrapper>{game ? <Game /> : <Boarding />}</AuthWrapper>
     </div>
   );
 }
