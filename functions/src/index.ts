@@ -36,7 +36,7 @@ export const createGame = functions.https.onCall(async (data, context) => {
 
     await firestore.doc(`/games/${code}`).set(newGame);
 
-    return { code };
+    return newGame;
   } catch (e) {
     functions.logger.error(e);
     return e.toString();
