@@ -6,9 +6,8 @@ import { GameContext, UserContext } from 'contexts';
 
 const Boarding: React.FC = () => {
   const { createGame, joinGame, creating, joining } = useContext(GameContext);
-  const { updateUsername, user } = useContext(UserContext);
+  const { setUsername, username } = useContext(UserContext);
 
-  const [name, setName] = useState('');
   const [code, setCode] = useState('');
 
   return (
@@ -27,9 +26,11 @@ const Boarding: React.FC = () => {
         Create new Game
       </Button>
       <hr />
-      <input value={name} onChange={(e) => setName(e.target.value)} />
-      <Button onClick={() => updateUsername(name)}>Update name</Button>
-      Username: {user.name}
+      <input
+        placeholder="Enter your name"
+        value={username}
+        onChange={(e) => e.target.value && setUsername(e.target.value)}
+      />
     </div>
   );
 };
