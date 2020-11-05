@@ -27,11 +27,16 @@ export const createGame = functions.https.onCall(async (data, context) => {
 
   if (!creatorUid) return 'No uid in context';
 
+  const userDoc = await firestore.doc(`/users/${creatorUid}`).get();
+  const user = userDoc.data();
+
+  if (!user) return 'User not found';
+
   try {
     const newGame: Game = {
       code,
       creatorUid,
-      playerUids: [creatorUid],
+      players: [{ uid: creatorUid, name: user.name }],
     };
 
     await firestore.doc(`/games/${code}`).set(newGame);
