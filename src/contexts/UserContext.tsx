@@ -1,12 +1,11 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { UpdateUsername, User } from 'types';
 
 import { projectAuth, projectFirestore, projectFunctions } from 'firebase_config';
-import { randomId } from './utils';
 
 type ContextProps = {
   loading: boolean;
@@ -24,22 +23,6 @@ export const UserProvider: React.FC = ({ children }) => {
   const doc = projectFirestore.doc(`users/${firebaseUser ? firebaseUser.uid : '1'}`);
   const [user] = useDocumentData<User>(doc);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!firebaseUser) return;
-
-    // const retrieveUser = async () => {
-    //   const doc = await projectFirestore.doc(`users/${firebaseUser.uid}`).get();
-    //
-    //   const data = doc.data();
-    //   if (!data) return;
-    //
-    //   localStorage.setItem('user', JSON.stringify(data));
-    //   setUser(data as User);
-    // };
-    //
-    // retrieveUser().then();
-  }, [firebaseUser]);
 
   const updateUsername = async (name: string) => {
     const fn: UpdateUsername = projectFunctions.httpsCallable('updateUsername');
