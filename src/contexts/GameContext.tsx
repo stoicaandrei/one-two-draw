@@ -16,6 +16,7 @@ type ContextProps = {
   createGame: () => void;
   joinGame: (code: string) => void;
   leaveGame: () => void;
+  error: string;
 };
 
 export const GameContext = createContext({} as ContextProps);
@@ -74,6 +75,7 @@ export const GameProvider: React.FC = (props) => {
         createGame,
         joinGame,
         leaveGame,
+        error,
       }}
     >
       {props.children}
