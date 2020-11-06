@@ -6,7 +6,7 @@ import { useDocumentData } from 'react-firebase-hooks/firestore';
 // import { Game, CreateGame, JoinGame, StartGame, PENDING } from '../../functions/src/types';
 
 import { UserContext } from './UserContext';
-import { randomCode } from './utils';
+import { randomCode, shuffle } from './utils';
 
 export type Player = {
   uid: string;
@@ -103,7 +103,7 @@ export const GameProvider: React.FC = (props) => {
   };
 
   const startGame = async () => {
-    await gameDoc.update({ state: PLAYING });
+    await gameDoc.update({ state: PLAYING, players: shuffle(game?.players) });
   };
 
   const finishGame = async () => {
