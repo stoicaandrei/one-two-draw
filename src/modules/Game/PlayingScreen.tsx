@@ -8,9 +8,14 @@ import { GameContext, UserContext } from 'contexts';
 
 const PlayingScreen: React.FC = () => {
   const { uid } = useContext(UserContext);
-  const { uploadDrawing, watchDrawing, uploading, currentPlayer, prevPlayer } = useContext(
-    GameContext
-  );
+  const {
+    uploadDrawing,
+    watchDrawing,
+    uploading,
+    currentPlayer,
+    prevPlayer,
+    nextPlayer,
+  } = useContext(GameContext);
 
   useEffect(() => {
     if (uid === currentPlayer?.uid) {
@@ -22,7 +27,13 @@ const PlayingScreen: React.FC = () => {
 
   if (!currentPlayer) return null;
 
-  if (uid !== currentPlayer.uid) return <div>{currentPlayer.name} is drawing...</div>;
+  if (uid !== currentPlayer.uid)
+    return (
+      <div>
+        <p>{currentPlayer.name} is drawing...</p>
+        {nextPlayer && <p>next player is {nextPlayer.name}</p>}
+      </div>
+    );
 
   if (prevPlayer && !currentPlayer.watchedPreviousDrawing)
     return (
