@@ -14,10 +14,16 @@ export type Player = {
   drawingUrl?: string;
 };
 
+export type Spectator = {
+  uid: string;
+  name: string;
+};
+
 export type Game = {
   code: string;
   creatorUid: string;
   players: Player[];
+  spectators: Spectator[];
   state: number;
 };
 
@@ -62,6 +68,7 @@ export const GameProvider: React.FC = (props) => {
       code,
       creatorUid: uid,
       players: [{ uid, name: username }],
+      spectators: [],
       state: PENDING,
     });
 
@@ -77,6 +84,12 @@ export const GameProvider: React.FC = (props) => {
 
     const newGameDoc = projectFirestore.doc(`games/${code}`);
     const newGame = (await newGameDoc.get()).data() as Game;
+
+    if (newGame.state !== PENDING) {
+      await newGameDoc.update({ spectators: [...newGame.spectators, { uid, name: username }] });
+      setGameCode(code);
+      return finish();
+    }
 
     const players = newGame?.players;
 
