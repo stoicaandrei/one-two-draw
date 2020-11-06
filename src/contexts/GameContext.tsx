@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-import { projectFunctions, projectFirestore } from 'firebase_config';
+import { projectStorage, projectFirestore } from 'firebase_config';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 // import { Game, CreateGame, JoinGame, StartGame, PENDING } from '../../functions/src/types';
@@ -11,6 +11,7 @@ import { randomCode } from './utils';
 export type Player = {
   uid: string;
   name: string;
+  drawingUrl?: string;
 };
 
 export type Game = {
@@ -30,10 +31,13 @@ type ContextProps = {
   retrieving: boolean;
   creating: boolean;
   joining: boolean;
+  uploading: boolean;
   createGame: () => void;
   joinGame: (code: string) => void;
   leaveGame: () => void;
   startGame: (code: string) => void;
+  finishGame: () => void;
+  uploadDrawing: (blob: Blob) => void;
   error: string;
 };
 
@@ -42,13 +46,14 @@ export const GameContext = createContext({} as ContextProps);
 export const GameProvider: React.FC = (props) => {
   const { username, uid } = useContext(UserContext);
   const [gameCode, setGameCode] = useState(undefined as any);
-  const [error, setError] = useState('');
+  const [error] = useState('');
 
   const gameDoc = projectFirestore.doc(`games/${gameCode || '1'}`);
   const [game, retrieving] = useDocumentData<Game>(gameDoc);
 
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const createGame = async () => {
     setCreating(true);
@@ -88,8 +93,38 @@ export const GameProvider: React.FC = (props) => {
     await gameDoc.update({ state: PLAYING });
   };
 
+  const finishGame = async () => {
+    await gameDoc.update({ state: FINISHED });
+  };
+
   const leaveGame = () => {
     setGameCode(undefined as any);
+  };
+
+  const uploadDrawing = async (blob: Blob) => {
+    setUploading(true);
+    const image = new Image();
+    image.src = blob as any;
+
+    const metadata = {
+      contentType: 'image/png',
+    };
+
+    const players = game?.players;
+    if (!players) return;
+
+    const drawingRef = projectStorage.ref(`/drawings/${uid}-${game?.code}`);
+
+    await drawingRef.put(blob, metadata);
+    const drawingUrl = await drawingRef.getDownloadURL();
+
+    players.forEach((pl) => {
+      if (pl.uid !== uid) return;
+
+      pl.drawingUrl = drawingUrl;
+    });
+
+    await gameDoc.update({ players });
   };
 
   return (
@@ -100,10 +135,13 @@ export const GameProvider: React.FC = (props) => {
         retrieving,
         joining,
         creating,
+        uploading,
         createGame,
         joinGame,
         leaveGame,
         startGame,
+        finishGame,
+        uploadDrawing,
         error,
       }}
     >

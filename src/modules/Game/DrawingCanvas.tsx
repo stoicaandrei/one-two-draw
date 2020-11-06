@@ -5,11 +5,27 @@ import { GithubPicker } from 'react-color';
 import { Slider, Button, Row, Col } from 'antd';
 import { UndoOutlined, ClearOutlined } from '@ant-design/icons';
 
-const DrawingCanvas: React.FC = () => {
+type Props = {
+  handleSave?: (blob: Blob) => void;
+};
+
+const DrawingCanvas: React.FC<Props> = ({ handleSave }) => {
   const [brushRadius, setBrushRadius] = useState(5);
   const [brushColor, setBrushColor] = useState('#333');
 
   const canvas = useRef<any>(null);
+
+  const extractImage = () => {
+    if (!handleSave) return;
+
+    const canvasDiv = document.getElementsByClassName('canvas-draw')[0];
+    const canvasElement = canvasDiv.getElementsByTagName('canvas')[1];
+
+    canvasElement.toBlob((blob) => {
+      if (!blob) return;
+      handleSave(blob);
+    });
+  };
 
   return (
     <div>
@@ -24,6 +40,7 @@ const DrawingCanvas: React.FC = () => {
             brushColor={brushColor}
             catenaryColor={brushColor}
             style={{ borderWidth: 100, borderColor: 'black', border: 'solid' }}
+            className="canvas-draw"
           />
         </Col>
         <Col>
@@ -57,6 +74,7 @@ const DrawingCanvas: React.FC = () => {
           </Row>
         </Col>
       </Row>
+      <Button onClick={extractImage}>I'm finished</Button>
     </div>
   );
 };
