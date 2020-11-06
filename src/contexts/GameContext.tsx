@@ -12,6 +12,7 @@ export type Player = {
   uid: string;
   name: string;
   drawingUrl?: string;
+  watchedPreviousDrawing: boolean;
 };
 
 export type Spectator = {
@@ -35,6 +36,8 @@ type ContextProps = {
   gameCode: string;
   game: Game;
   currentPlayer: Player;
+  prevPlayer: Player;
+  nextPlayer: Player;
   retrieving: boolean;
   creating: boolean;
   joining: boolean;
@@ -45,6 +48,7 @@ type ContextProps = {
   startGame: (code: string) => void;
   finishGame: () => void;
   uploadDrawing: (blob: Blob) => void;
+  watchDrawing: () => void;
   error: string;
 };
 
@@ -58,7 +62,18 @@ export const GameProvider: React.FC = (props) => {
   const gameDoc = projectFirestore.doc(`games/${gameCode || '1'}`);
   const [game, retrieving] = useDocumentData<Game>(gameDoc);
 
-  const currentPlayer = game?.players.find((pl) => !pl.drawingUrl);
+  let currentIndex = -1;
+  game?.players.forEach((pl, i) => {
+    if (currentIndex !== -1) return;
+
+    if (!pl.drawingUrl) {
+      currentIndex = i;
+    }
+  });
+
+  const currentPlayer = game?.players[currentIndex];
+  const prevPlayer = game?.players[currentIndex - 1];
+  const nextPlayer = game?.players[currentIndex + 1];
 
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -70,7 +85,7 @@ export const GameProvider: React.FC = (props) => {
     await projectFirestore.doc(`games/${code}`).set({
       code,
       creatorUid: uid,
-      players: [{ uid, name: username }],
+      players: [{ uid, name: username, watchedPreviousDrawing: false }],
       spectators: [],
       state: PENDING,
     });
@@ -99,14 +114,19 @@ export const GameProvider: React.FC = (props) => {
     if (!players) return finish();
     if (players.find((pl) => pl.uid === uid)) return finish();
 
-    await newGameDoc.update({ players: [...players, { uid, name: username }] });
+    await newGameDoc.update({
+      players: [...players, { uid, name: username, watchedPreviousDrawing: false }],
+    });
 
     setGameCode(code);
     finish();
   };
 
   const startGame = async () => {
-    await gameDoc.update({ state: PLAYING, players: shuffle(game?.players) });
+    const players = shuffle(game?.players);
+    players[0].watchedPreviousDrawing = true;
+
+    await gameDoc.update({ state: PLAYING, players });
   };
 
   const finishGame = async () => {
@@ -142,10 +162,21 @@ export const GameProvider: React.FC = (props) => {
 
     await gameDoc.update({ players });
 
-    console.log('no drawings ', !players.find((pl) => !pl.drawingUrl));
     if (!players.find((pl) => !pl.drawingUrl)) await finishGame();
 
     setUploading(false);
+  };
+
+  const watchDrawing = async () => {
+    const players = game?.players;
+    if (!players) return;
+
+    players.forEach((pl) => {
+      if (pl.uid !== uid) return;
+
+      pl.watchedPreviousDrawing = true;
+    });
+    await gameDoc.update({ players });
   };
 
   return (
@@ -154,6 +185,8 @@ export const GameProvider: React.FC = (props) => {
         gameCode,
         game: game || (undefined as any),
         currentPlayer: currentPlayer || (undefined as any),
+        prevPlayer: prevPlayer || (undefined as any),
+        nextPlayer: nextPlayer || (undefined as any),
         retrieving,
         joining,
         creating,
@@ -164,6 +197,7 @@ export const GameProvider: React.FC = (props) => {
         startGame,
         finishGame,
         uploadDrawing,
+        watchDrawing,
         error,
       }}
     >
