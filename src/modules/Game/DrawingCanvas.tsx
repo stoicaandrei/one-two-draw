@@ -7,9 +7,10 @@ import { UndoOutlined, ClearOutlined } from '@ant-design/icons';
 
 type Props = {
   handleSave?: (blob: Blob) => void;
+  loading?: boolean;
 };
 
-const DrawingCanvas: React.FC<Props> = ({ handleSave }) => {
+const DrawingCanvas: React.FC<Props> = ({ handleSave, loading }) => {
   const [brushRadius, setBrushRadius] = useState(5);
   const [brushColor, setBrushColor] = useState('#333');
 
@@ -74,7 +75,9 @@ const DrawingCanvas: React.FC<Props> = ({ handleSave }) => {
           </Row>
         </Col>
       </Row>
-      <Button onClick={extractImage}>I'm finished</Button>
+      <Button onClick={extractImage} loading={loading}>
+        I'm finished
+      </Button>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import { projectStorage, projectFirestore } from 'firebase_config';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
@@ -34,6 +34,7 @@ export const FINISHED = 2;
 type ContextProps = {
   gameCode: string;
   game: Game;
+  currentPlayer: Player;
   retrieving: boolean;
   creating: boolean;
   joining: boolean;
@@ -56,6 +57,8 @@ export const GameProvider: React.FC = (props) => {
 
   const gameDoc = projectFirestore.doc(`games/${gameCode || '1'}`);
   const [game, retrieving] = useDocumentData<Game>(gameDoc);
+
+  const currentPlayer = game?.players.find((pl) => !pl.drawingUrl);
 
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -138,6 +141,11 @@ export const GameProvider: React.FC = (props) => {
     });
 
     await gameDoc.update({ players });
+
+    console.log('no drawings ', !players.find((pl) => !pl.drawingUrl));
+    if (!players.find((pl) => !pl.drawingUrl)) await finishGame();
+
+    setUploading(false);
   };
 
   return (
@@ -145,6 +153,7 @@ export const GameProvider: React.FC = (props) => {
       value={{
         gameCode,
         game: game || (undefined as any),
+        currentPlayer: currentPlayer || (undefined as any),
         retrieving,
         joining,
         creating,
