@@ -1,7 +1,16 @@
 import * as functions from 'firebase-functions';
 import { firestore } from './config';
 
-import { FirstArgument, Game, JoinGame, CreateGame, ExtractReturn } from './types';
+import {
+  FirstArgument,
+  Game,
+  JoinGame,
+  CreateGame,
+  ExtractReturn,
+  StartGame,
+  // PENDING,
+  PLAYING,
+} from './types';
 
 import { randomCode } from './utils';
 
@@ -18,7 +27,10 @@ export const createGame = functions.https.onCall(
         code,
         creatorUid,
         players: [{ uid: creatorUid, name: data.username }],
+        state: 0,
       };
+
+      functions.logger.log(newGame);
 
       await firestore.doc(`/games/${code}`).set(newGame);
 
@@ -43,8 +55,27 @@ export const joinGame = functions.https.onCall(
     if (!gameData) return 'Invalid code';
 
     if (!gameData.players.find((pl) => pl.uid === uid))
-      await gameDoc.set({ players: [...gameData.players, { uid, name: data.username }] });
+      await gameDoc.update({ players: [...gameData.players, { uid, name: data.username }] });
 
     return true;
+  }
+);
+
+export const startGame = functions.https.onCall(
+  async (data: FirstArgument<StartGame>, context): ExtractReturn<StartGame> => {
+    const uid = context.auth?.uid;
+    if (!uid) return 'No uid in context';
+    if (!data.code) return 'No cod provided';
+
+    const gameDoc = firestore.doc(`/games/${data.code}`);
+    const gameData = (await gameDoc.get()).data() as Game;
+
+    if (!gameData) return 'Invalid code';
+
+    if (gameData.creatorUid !== uid) return 'You are not the creator';
+
+    await gameDoc.update({ state: PLAYING });
+
+    return '';
   }
 );

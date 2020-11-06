@@ -3,9 +3,26 @@ import React, { createContext, useContext, useState } from 'react';
 import { projectFunctions, projectFirestore } from 'firebase_config';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
-import { Game, CreateGame, JoinGame } from 'types';
+// import { Game, CreateGame, JoinGame, StartGame, PENDING } from '../../functions/src/types';
 
 import { UserContext } from './UserContext';
+import { randomCode } from './utils';
+
+export type Player = {
+  uid: string;
+  name: string;
+};
+
+export type Game = {
+  code: string;
+  creatorUid: string;
+  players: Player[];
+  state: number;
+};
+
+export const PENDING = 0;
+export const PLAYING = 1;
+export const FINISHED = 2;
 
 type ContextProps = {
   gameCode: string;
@@ -16,48 +33,59 @@ type ContextProps = {
   createGame: () => void;
   joinGame: (code: string) => void;
   leaveGame: () => void;
+  startGame: (code: string) => void;
   error: string;
 };
 
 export const GameContext = createContext({} as ContextProps);
 
 export const GameProvider: React.FC = (props) => {
-  const { username } = useContext(UserContext);
+  const { username, uid } = useContext(UserContext);
   const [gameCode, setGameCode] = useState(undefined as any);
   const [error, setError] = useState('');
 
-  const doc = projectFirestore.doc(`games/${gameCode || '1'}`);
-  const [game, retrieving] = useDocumentData<Game>(doc);
+  const gameDoc = projectFirestore.doc(`games/${gameCode || '1'}`);
+  const [game, retrieving] = useDocumentData<Game>(gameDoc);
 
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
 
   const createGame = async () => {
     setCreating(true);
-    const fn: CreateGame = projectFunctions.httpsCallable('createGame');
-    const res = await fn({ username });
+    const code = randomCode();
+    await projectFirestore.doc(`games/${code}`).set({
+      code,
+      creatorUid: uid,
+      players: [{ uid, name: username }],
+      state: PENDING,
+    });
 
-    if (typeof res.data === 'string') {
-      setError(res.data);
-    } else {
-      setGameCode(res.data.code);
-    }
+    setGameCode(code);
 
     setCreating(false);
   };
 
   const joinGame = async (code: string) => {
     setJoining(true);
-    const fn: JoinGame = projectFunctions.httpsCallable('joinGame');
-    const res = await fn({ username, code });
 
-    if (typeof res.data === 'string') {
-      setError(res.data);
-    } else {
-      setGameCode(code);
-    }
+    const finish = () => setJoining(false);
 
-    setJoining(false);
+    const newGameDoc = projectFirestore.doc(`games/${code}`);
+    const newGame = (await newGameDoc.get()).data() as Game;
+
+    const players = newGame?.players;
+
+    if (!players) return finish();
+    if (players.find((pl) => pl.uid === uid)) return finish();
+
+    await newGameDoc.update({ players: [...players, { uid, name: username }] });
+
+    setGameCode(code);
+    finish();
+  };
+
+  const startGame = async () => {
+    await gameDoc.update({ state: PLAYING });
   };
 
   const leaveGame = () => {
@@ -75,6 +103,7 @@ export const GameProvider: React.FC = (props) => {
         createGame,
         joinGame,
         leaveGame,
+        startGame,
         error,
       }}
     >

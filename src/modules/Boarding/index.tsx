@@ -18,18 +18,18 @@ const Boarding: React.FC = () => {
         value={code}
         onChange={(e) => setCode(e.target.value)}
       />
-      <Button type="primary" onClick={() => joinGame(code)} loading={joining}>
+      <Button type="primary" onClick={() => joinGame(code)} loading={joining} disabled={!username}>
         Join
       </Button>
       <hr />
-      <Button type="primary" onClick={createGame} loading={creating}>
+      <Button type="primary" onClick={createGame} loading={creating} disabled={!username}>
         Create new Game
       </Button>
       <hr />
       <input
         placeholder="Enter your name"
         value={username}
-        onChange={(e) => e.target.value && setUsername(e.target.value)}
+        onChange={(e) => setUsername(e.target.value)}
       />
     </div>
   );

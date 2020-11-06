@@ -9,3 +9,5 @@ export type ExtractReturn<Fn> = Fn extends (...args: any[]) => infer R
 export type CreateGame = (data: { username: string }) => HTTSReturn<{ code: string } | string>;
 
 export type JoinGame = (data: { code: string; username: string }) => HTTSReturn<boolean | string>;
+
+export type StartGame = (data: { code: string }) => HTTSReturn<string>;

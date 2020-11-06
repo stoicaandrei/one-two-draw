@@ -1,26 +1,17 @@
 import React, { useContext } from 'react';
 
-import { Button } from 'antd';
+import PendingScreen from './PendingScreen';
 
-import { GameContext } from 'contexts';
+import { GameContext, PENDING } from 'contexts';
 
 const Game: React.FC = () => {
-  const { game, leaveGame } = useContext(GameContext);
+  const { game } = useContext(GameContext);
 
   console.log(game);
 
-  return (
-    <div>
-      <p>Code: {game.code}</p>
-      Players:
-      <ul>
-        {game.players.map((pl) => (
-          <li key={pl.uid}>{pl.name}</li>
-        ))}
-      </ul>
-      <Button onClick={leaveGame}>leave</Button>
-    </div>
-  );
+  if (game.state === PENDING) return <PendingScreen />;
+
+  return <p>playing</p>;
 };
 
 export default Game;
