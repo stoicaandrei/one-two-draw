@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 import { projectStorage, projectFirestore } from 'firebase_config';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
