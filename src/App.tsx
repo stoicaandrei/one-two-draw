@@ -11,6 +11,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* AuthWrapper makes sure that the user is automatically authenticated */}
       <AuthWrapper>{game ? <Game /> : <Boarding />}</AuthWrapper>
     </div>
   );

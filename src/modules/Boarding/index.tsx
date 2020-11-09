@@ -11,7 +11,13 @@ const Boarding: React.FC = () => {
   const [code, setCode] = useState('');
 
   return (
-    <div>
+    <div style={{ width: 200 }}>
+      <input
+        placeholder="Enter your name"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <hr />
       <Input
         placeholder="Game code"
         style={{ width: 100 }}
@@ -25,12 +31,6 @@ const Boarding: React.FC = () => {
       <Button type="primary" onClick={createGame} loading={creating} disabled={!username}>
         Create new Game
       </Button>
-      <hr />
-      <input
-        placeholder="Enter your name"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
     </div>
   );
 };

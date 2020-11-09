@@ -15,8 +15,10 @@ const PlayingScreen: React.FC = () => {
     currentPlayer,
     prevPlayer,
     nextPlayer,
+    gameCode,
   } = useContext(GameContext);
 
+  //
   useEffect(() => {
     if (uid === currentPlayer?.uid) {
       setTimeout(() => {
@@ -30,6 +32,7 @@ const PlayingScreen: React.FC = () => {
   if (uid !== currentPlayer.uid)
     return (
       <div>
+        <p>Code: {gameCode}</p>
         <p>{currentPlayer.name} is drawing...</p>
         {nextPlayer && <p>next player is {nextPlayer.name}</p>}
       </div>
@@ -38,6 +41,7 @@ const PlayingScreen: React.FC = () => {
   if (prevPlayer && !currentPlayer.watchedPreviousDrawing)
     return (
       <div>
+        <p>Code: {gameCode}</p>
         Take a good look at this
         <Image src={prevPlayer.drawingUrl} />
       </div>

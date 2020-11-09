@@ -8,7 +8,6 @@ import { FINISHED, GameContext, PENDING, PLAYING } from 'contexts';
 
 const Game: React.FC = () => {
   const { game } = useContext(GameContext);
-  console.log(game);
 
   switch (game.state) {
     case PENDING:
